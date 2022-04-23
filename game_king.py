@@ -126,12 +126,14 @@ class Enemy(object):
     def redraw(self, window):
         window.blit(images.standing, (self.x, self.y))
 
+
 enemies = []
 projectiles = []
 rules = Rules()
 player = Player(200, 200, 64, 64)
 enemy = Enemy(700, 700, 64, 64)
 enemies.append(enemy)
+
 
 def full_redraw(projectiles):
     rules.window.blit(images.bg, (0, 0))
@@ -144,7 +146,9 @@ def full_redraw(projectiles):
     for e in enemies:
         e.redraw(rules.window)
         for p in projectiles:
-            if (e.x + 32) > p["arrow"].x > (e.x - 32) and (e.y + 32) > p["arrow"].y > (e.y - 32):
+            if (e.x + 32) > p["arrow"].x > (e.x - 32) and (e.y + 32) > p["arrow"].y > (
+                e.y - 32
+            ):
                 enemies.remove(e)
                 projectiles.remove(p)
 
