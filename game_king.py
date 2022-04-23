@@ -116,6 +116,23 @@ class Projectile(object):
                 window.blit(images.arrow_down, (self.x, self.y))
 
 
+class Enemy(object):
+    def __init__(self, x, y, wight, height):
+        self.x = x
+        self.y = y
+        self.wight = wight
+        self.height = height
+
+    def redraw(self, window):
+        window.blit(images.standing, (self.x, self.y))
+
+enemies = []
+projectiles = []
+rules = Rules()
+player = Player(200, 200, 64, 64)
+enemy = Enemy(700, 700, 64, 64)
+enemies.append(enemy)
+
 def full_redraw(projectiles):
     rules.window.blit(images.bg, (0, 0))
 
@@ -124,12 +141,14 @@ def full_redraw(projectiles):
         p["arrow"].redraw(rules.window, p["direction"])
         if 0 >= p["arrow"].x >= 1999 or 0 >= p["arrow"].y >= 1999:
             projectiles.remove(p)
+    for e in enemies:
+        e.redraw(rules.window)
+        for p in projectiles:
+            if (e.x + 32) > p["arrow"].x > (e.x - 32) and (e.y + 32) > p["arrow"].y > (e.y - 32):
+                enemies.remove(e)
+                projectiles.remove(p)
+
     pygame.display.update()
-
-
-projectiles = []
-rules = Rules()
-player = Player(200, 200, 64, 64)
 
 
 def start_game():
