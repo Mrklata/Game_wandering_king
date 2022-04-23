@@ -35,7 +35,7 @@ class Images:
             pygame.image.load("static_files/D3.png"),
         ]
         self.standing = pygame.image.load("static_files/D1.png")
-        self.bg = pygame.image.load("static_files/bg_grass.jpeg")
+        self.bg = pygame.image.load("static_files/bg.jpg")
         self.arrow_left = pygame.transform.scale(
             pygame.image.load("static_files/AL.png"), (50, 50)
         )
