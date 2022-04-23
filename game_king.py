@@ -335,7 +335,6 @@ def start_game():
                 direction = "down"
             if rules.count_projectiles > 0:
                 rules.count_projectiles -= 1
-                print(rules.count_projectiles)
                 rules.projectiles.append(
                     {
                         "arrow": Projectile(player.x, player.y, 20, 20),
