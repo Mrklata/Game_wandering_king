@@ -18,6 +18,9 @@ class Rules:
         self.projectiles = []
         self.count_projectiles = 5
         self.mistake = 32
+        self.score = 0.0
+        self.kills = 0
+        self.font = pygame.font.SysFont("Times New Roman", 18)
 
 
 class Images:
@@ -328,6 +331,10 @@ def full_redraw(projectiles):
     rules.window.blit(images.bg, (0, 0))
     if hearth.count == 0:
         game_over.redraw(rules.window)
+        score = rules.font.render(f"You have scored {round(rules.score, 1)}", True, "black")
+        kills = rules.font.render(f"And killed {rules.kills} robbers", True, "black")
+        rules.window.blit(score, (rules.screen_wight//2 - 100, rules.screen_height//2 + 100))
+        rules.window.blit(kills, (rules.screen_wight // 2 - 100, rules.screen_height // 2 + 120))
     elif hearth.count > 0:
         # Draw player
         player.redraw(rules.window)
@@ -382,6 +389,7 @@ def full_redraw(projectiles):
                     e.y + rules.mistake
                 ) > p["arrow"].y > (e.y - rules.mistake):
                     projectiles.remove(p)
+                    rules.kills += 1
                     # Sometimes if two projectiles hit one enemy it tried to remove same enemy twice
                     try:
                         rules.enemies.remove(e)
@@ -406,10 +414,20 @@ def start_game():
     # Main loop
     while run:
         rules.clock.tick(27)
+
+        # Tick for ammo
         if ticker > 0:
             ticker -= 1
+
+        # Tick for spawning enemies
         if spawn_ticker > 0:
             spawn_ticker -= 1
+
+        # Score count
+        if not game_over:
+            rules.score += 0.1
+
+        # Game quit
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -422,10 +440,10 @@ def start_game():
         ):
             rules.count_projectiles = 5
             ammo_kit.x = random.randint(
-                rules.mistake, rules.screen_wight - rules.mistake
+                rules.mistake, rules.screen_wight - rules.mistake*2
             )
-            ammo_kit.x = random.randint(
-                rules.mistake, rules.screen_height - rules.mistake
+            ammo_kit.y = random.randint(
+                rules.mistake, rules.screen_height - rules.mistake*2
             )
 
         # No more lives
@@ -616,23 +634,18 @@ def start_game():
 
         # Spawn enemy
         if spawn_ticker == 0 and not game_over:
+            x = random.randint(rules.mistake, rules.screen_wight - rules.mistake)
+            y = random.randint(rules.mistake, rules.screen_height - rules.mistake)
+            if not (player.x + rules.mistake**2 >= x >= player.x + rules.mistake*2) and not (player.y + rules.mistake*2 >= y >= player.y + rules.mistake*2):
+                x += rules.mistake*2
+                y += rules.mistake*2
+                print("too close")
             enemy = Enemy(
-                random.randint(rules.mistake, rules.screen_wight - rules.mistake),
-                random.randint(rules.mistake, rules.screen_height - rules.mistake),
+                x, y,
                 64,
                 64,
                 random.uniform(1, 2),
             )
-
-            while (player.x + 250 >= enemy.x >= player.x + 250) and (
-                player.y + 250 >= enemy.y >= player.y + 250
-            ):
-                enemy.x = random.randint(
-                    rules.mistake, rules.screen_wight - rules.mistake
-                )
-                enemy.y = random.randint(
-                    rules.mistake, rules.screen_height - rules.mistake
-                )
             rules.enemies.append(enemy)
             spawn_ticker = 20
 
