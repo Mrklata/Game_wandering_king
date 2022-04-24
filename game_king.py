@@ -650,13 +650,15 @@ def start_game():
             # Make sure enemy won't spawn too close to player
             x = random.randint(rules.mistake, rules.screen_wight - rules.mistake)
             y = random.randint(rules.mistake, rules.screen_height - rules.mistake)
-            if not (
-                player.x + rules.mistake**2 >= x >= player.x + rules.mistake * 2
-            ) and not (
-                player.y + rules.mistake * 2 >= y >= player.y + rules.mistake * 2
+            if (
+                player.x + rules.mistake * 2 >= x >= player.x - rules.mistake * 2
+            ) and (
+                player.y + rules.mistake * 2 >= y >= player.y - rules.mistake * 2
             ):
-                x += rules.mistake * 4
-                y += rules.mistake * 4
+                if player.x > 600:
+                    x -= rules.mistake * 3
+                if player.x < 600:
+                    x += rules.mistake * 3
             enemy = Enemy(
                 x,
                 y,
