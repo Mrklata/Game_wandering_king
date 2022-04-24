@@ -1,141 +1,9 @@
 import random
-
 import pygame
 
+from game_data import Images, Rules
 
 pygame.init()
-
-
-class Rules:
-    """General information about the game."""
-
-    def __init__(self):
-        self.clock = pygame.time.Clock()
-        self.screen_wight = 1500
-        self.screen_height = 900
-        self.window = pygame.display.set_mode((self.screen_wight, self.screen_height))
-        self.enemies = []
-        self.projectiles = []
-        self.max_ammo = 5
-        self.count_projectiles = 5
-        self.mistake = 32
-        self.score = 0.0
-        self.kills = 0
-        self.font = pygame.font.SysFont("Times New Roman", 18)
-        self.font_big = pygame.font.SysFont("Times New Roman", 50)
-
-
-class Images:
-    """All images."""
-
-    def __init__(self):
-        self.walk_left = [
-            pygame.image.load("static_files/walk_left/1.png"),
-            pygame.image.load("static_files/walk_left/2.png"),
-            pygame.image.load("static_files/walk_left/3.png"),
-            pygame.image.load("static_files/walk_left/4.png"),
-            pygame.image.load("static_files/walk_left/5.png"),
-            pygame.image.load("static_files/walk_left/6.png"),
-        ]
-        self.walk_left_up = [
-            pygame.image.load("static_files/walk_left_up/1.png"),
-            pygame.image.load("static_files/walk_left_up/2.png"),
-            pygame.image.load("static_files/walk_left_up/3.png"),
-            pygame.image.load("static_files/walk_left_up/4.png"),
-            pygame.image.load("static_files/walk_left_up/5.png"),
-            pygame.image.load("static_files/walk_left_up/6.png"),
-        ]
-        self.walk_left_down = [
-            pygame.image.load("static_files/walk_left_down/1.png"),
-            pygame.image.load("static_files/walk_left_down/2.png"),
-            pygame.image.load("static_files/walk_left_down/3.png"),
-            pygame.image.load("static_files/walk_left_down/4.png"),
-            pygame.image.load("static_files/walk_left_down/5.png"),
-            pygame.image.load("static_files/walk_left_down/6.png"),
-        ]
-        self.walk_right = [
-            pygame.image.load("static_files/walk_right/1.png"),
-            pygame.image.load("static_files/walk_right/2.png"),
-            pygame.image.load("static_files/walk_right/3.png"),
-            pygame.image.load("static_files/walk_right/4.png"),
-            pygame.image.load("static_files/walk_right/5.png"),
-            pygame.image.load("static_files/walk_right/6.png"),
-        ]
-        self.walk_right_up = [
-            pygame.image.load("static_files/walk_right_up/1.png"),
-            pygame.image.load("static_files/walk_right_up/2.png"),
-            pygame.image.load("static_files/walk_right_up/3.png"),
-            pygame.image.load("static_files/walk_right_up/4.png"),
-            pygame.image.load("static_files/walk_right_up/5.png"),
-            pygame.image.load("static_files/walk_right_up/6.png"),
-        ]
-        self.walk_right_down = [
-            pygame.image.load("static_files/walk_right_down/1.png"),
-            pygame.image.load("static_files/walk_right_down/2.png"),
-            pygame.image.load("static_files/walk_right_down/3.png"),
-            pygame.image.load("static_files/walk_right_down/4.png"),
-            pygame.image.load("static_files/walk_right_down/5.png"),
-            pygame.image.load("static_files/walk_right_down/6.png"),
-        ]
-        self.walk_up = [
-            pygame.image.load("static_files/walk_up/1.png"),
-            pygame.image.load("static_files/walk_up/2.png"),
-            pygame.image.load("static_files/walk_up/3.png"),
-            pygame.image.load("static_files/walk_up/4.png"),
-            pygame.image.load("static_files/walk_up/5.png"),
-            pygame.image.load("static_files/walk_up/6.png"),
-        ]
-        self.walk_down = [
-            pygame.image.load("static_files/walk_down/1.png"),
-            pygame.image.load("static_files/walk_down/2.png"),
-            pygame.image.load("static_files/walk_down/3.png"),
-            pygame.image.load("static_files/walk_down/4.png"),
-            pygame.image.load("static_files/walk_down/5.png"),
-            pygame.image.load("static_files/walk_down/6.png"),
-        ]
-        self.standing = pygame.image.load("static_files/walk_down/1.png")
-        self.bg = pygame.image.load("static_files/bg_pro.png")
-        self.arrow_left = pygame.transform.scale(
-            pygame.image.load("static_files/AL.png"), (50, 50)
-        )
-        self.arrow_left_up = pygame.transform.scale(
-            pygame.image.load("static_files/ALU.png"), (25, 25)
-        )
-        self.arrow_left_down = pygame.transform.scale(
-            pygame.image.load("static_files/ALD.png"), (25, 25)
-        )
-        self.arrow_right = pygame.transform.scale(
-            pygame.image.load("static_files/AR.png"), (50, 50)
-        )
-        self.arrow_right_up = pygame.transform.scale(
-            pygame.image.load("static_files/ARU.png"), (25, 25)
-        )
-        self.arrow_right_down = pygame.transform.scale(
-            pygame.image.load("static_files/ARD.png"), (25, 25)
-        )
-        self.arrow_up = pygame.transform.scale(
-            pygame.image.load("static_files/AU.png"), (50, 50)
-        )
-        self.arrow_down = pygame.transform.scale(
-            pygame.image.load("static_files/AD.png"), (50, 50)
-        )
-        self.ammo = pygame.image.load("static_files/ammo.png")
-        self.a1 = pygame.image.load("static_files/a1.png")
-        self.a2 = pygame.image.load("static_files/a2.png")
-        self.a3 = pygame.image.load("static_files/a3.png")
-        self.a4 = pygame.image.load("static_files/a4.png")
-        self.a5 = pygame.image.load("static_files/a5.png")
-        self.ammo_kit = pygame.transform.scale(
-            pygame.image.load("static_files/ammokit.png"), (40, 40)
-        )
-        self.enemy = pygame.transform.scale(
-            pygame.image.load("static_files/enemy.png"), (64, 64)
-        )
-        self.hearth_3 = pygame.image.load("static_files/life/3.png")
-        self.hearth_2 = pygame.image.load("static_files/life/2.png")
-        self.hearth_1 = pygame.image.load("static_files/life/1.png")
-        self.game_over = pygame.image.load("static_files/game_over.png")
-
 
 # Adding game title and creating images and rules
 pygame.display.set_caption("Wandering King")
@@ -243,6 +111,68 @@ class Projectile(object):
                 window.blit(images.arrow_down, (self.x, self.y))
 
 
+class Tornado(object):
+    """Tornado and all its information."""
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.speed = 20
+        self.range = 400
+        self.spin_count = 0
+
+    def redraw(self, window, direction):
+        """Draw tornado."""
+        if self.spin_count + 1 >= 4:
+            self.spin_count = 0
+        if self.range > 0:
+            if direction == "left":
+                self.x -= self.speed
+                self.range -= self.speed
+                window.blit(images.tornado[self.spin_count//2], (self.x, self.y))
+                self.spin_count += 1
+            if direction == "left_up":
+                self.x -= self.speed
+                self.y -= self.speed
+                self.range -= self.speed
+                window.blit(images.tornado[self.spin_count//2], (self.x, self.y))
+                self.spin_count += 1
+            if direction == "left_down":
+                self.x -= self.speed
+                self.y += self.speed
+                self.range -= self.speed
+                window.blit(images.tornado[self.spin_count//2], (self.x, self.y))
+                self.spin_count += 1
+            if direction == "right":
+                self.x += self.speed
+                self.range -= self.speed
+                window.blit(images.tornado[self.spin_count//2], (self.x, self.y))
+                self.spin_count += 1
+            if direction == "right_up":
+                self.x += self.speed
+                self.y -= self.speed
+                window.blit(images.tornado[self.spin_count//2], (self.x, self.y))
+                self.spin_count += 1
+            if direction == "right_down":
+                self.x += self.speed
+                self.y += self.speed
+                self.range -= self.speed
+                window.blit(images.tornado[self.spin_count//2], (self.x, self.y))
+                self.spin_count += 1
+            if direction == "up":
+                self.y -= self.speed
+                self.range -= self.speed
+                window.blit(images.tornado[self.spin_count//2], (self.x, self.y))
+                self.spin_count += 1
+            if direction == "down":
+                self.y += self.speed
+                self.range -= self.speed
+                window.blit(images.tornado[self.spin_count//2], (self.x, self.y))
+                self.spin_count += 1
+        else:
+            rules.tornados = []
+
+
 class AmmoKit(object):
     """Ammo kit and all its information."""
 
@@ -307,10 +237,19 @@ hearth = Life()
 game_over = GameOver()
 
 
-def full_redraw(projectiles):
+def full_redraw(projectiles, tornados):
     """Redraw all objects, projectiles etc."""
     # Draw background
     rules.window.blit(images.bg, (0, 0))
+
+    # Cooldown skill draw
+    cooldown = rules.font.render(f'{rules.tornado_ticker}', True, "black")
+    if rules.tornado_ticker == 0:
+        rules.window.blit(images.tornado[0], (rules.screen_wight - 50, 50))
+    else:
+        rules.window.blit(images.tornado_bw, (rules.screen_wight - 50, 50))
+    rules.window.blit(cooldown, (rules.screen_wight - 50, 100))
+
     if hearth.count == 0:
         game_over.redraw(rules.window)
         survive = rules.font.render(
@@ -336,6 +275,7 @@ def full_redraw(projectiles):
 
         # Draw hearths
         hearth.redraw(rules.window)
+
         # Loop for drawing projectiles
         for p in projectiles:
             p["arrow"].redraw(rules.window, p["direction"])
@@ -344,6 +284,16 @@ def full_redraw(projectiles):
                 or 0 >= p["arrow"].y >= rules.screen_height
             ):
                 projectiles.remove(p)
+
+        # Loop for tornado
+        for t in tornados:
+
+            t["tornado"].redraw(rules.window, t["direction"])
+            if (
+                0 >= t["tornado"].x >= rules.screen_wight
+                or 0 >= t["tornado"].y >= rules.screen_height
+            ):
+                tornados.remove(t)
 
         # Loop for changing enemies positions
         for e in rules.enemies:
@@ -367,6 +317,9 @@ def full_redraw(projectiles):
                 e.x -= e.speed
             if e.x < player.x and e.y == player.y:
                 e.x += e.speed
+            # Draw enemies
+            e.redraw(rules.window)
+
             # Getting killed
             if (
                 player.x + rules.mistake >= e.x >= player.x - rules.mistake
@@ -376,8 +329,6 @@ def full_redraw(projectiles):
                 rules.enemies = []
                 rules.max_ammo += 5
                 rules.count_projectiles = rules.max_ammo
-            # Draw enemies
-            e.redraw(rules.window)
 
             # Check if projectile hit enemy, remove both when hit
             for p in projectiles:
@@ -390,7 +341,17 @@ def full_redraw(projectiles):
                     try:
                         rules.enemies.remove(e)
                     except ValueError:
-                        print("Same enemy hit by two arrows")
+                        print("Same enemy hit twice")
+
+            # Check if tornado hits enemy
+            for t in tornados:
+                if (e.x + rules.mistake) > t["tornado"].x > (e.x - rules.mistake) and (
+                        e.y + rules.mistake
+                ) > t["tornado"].y > (e.y - rules.mistake):
+                    try:
+                        rules.enemies.remove(e)
+                    except ValueError:
+                        print("Same enemy hit twice")
 
         # Draw ammo and ammo kit
         ammo_kit.redraw(rules.window)
@@ -418,7 +379,8 @@ def start_game():
             ticker -= 1
         if spawn_ticker > 0:
             spawn_ticker -= 1
-
+        if rules.tornado_ticker > 0:
+            rules.tornado_ticker -= 1
         # Score count
         if not game_over:
             rules.score += 0.1
@@ -635,6 +597,30 @@ def start_game():
                         "direction": direction,
                     }
                 )
+        if keys[pygame.K_w] and rules.tornado_ticker == 0 and not player.standing:
+            tornado = Tornado(player.x, player.y)
+            direction = None
+            if player.right:
+                direction = "right"
+            if player.right_up:
+                direction = "right_up"
+            if player.right_down:
+                direction = "right_down"
+            if player.left:
+                direction = "left"
+            if player.left_up:
+                direction = "left_up"
+            if player.left_down:
+                direction = "left_down"
+            if player.up:
+                direction = "up"
+            if player.down:
+                direction = "down"
+            rules.tornados.append({
+                "tornado": tornado,
+                "direction": direction,
+            })
+            rules.tornado_ticker = 1000
 
         # Spawn enemy
         if spawn_ticker == 0 and not game_over:
@@ -658,4 +644,4 @@ def start_game():
             rules.enemies.append(enemy)
             spawn_ticker = 20
 
-        full_redraw(rules.projectiles)
+        full_redraw(rules.projectiles, rules.tornados)
