@@ -129,45 +129,45 @@ class Tornado(object):
             if direction == "left":
                 self.x -= self.speed
                 self.range -= self.speed
-                window.blit(images.tornado[self.spin_count//2], (self.x, self.y))
+                window.blit(images.tornado[self.spin_count // 2], (self.x, self.y))
                 self.spin_count += 1
             if direction == "left_up":
                 self.x -= self.speed
                 self.y -= self.speed
                 self.range -= self.speed
-                window.blit(images.tornado[self.spin_count//2], (self.x, self.y))
+                window.blit(images.tornado[self.spin_count // 2], (self.x, self.y))
                 self.spin_count += 1
             if direction == "left_down":
                 self.x -= self.speed
                 self.y += self.speed
                 self.range -= self.speed
-                window.blit(images.tornado[self.spin_count//2], (self.x, self.y))
+                window.blit(images.tornado[self.spin_count // 2], (self.x, self.y))
                 self.spin_count += 1
             if direction == "right":
                 self.x += self.speed
                 self.range -= self.speed
-                window.blit(images.tornado[self.spin_count//2], (self.x, self.y))
+                window.blit(images.tornado[self.spin_count // 2], (self.x, self.y))
                 self.spin_count += 1
             if direction == "right_up":
                 self.x += self.speed
                 self.y -= self.speed
-                window.blit(images.tornado[self.spin_count//2], (self.x, self.y))
+                window.blit(images.tornado[self.spin_count // 2], (self.x, self.y))
                 self.spin_count += 1
             if direction == "right_down":
                 self.x += self.speed
                 self.y += self.speed
                 self.range -= self.speed
-                window.blit(images.tornado[self.spin_count//2], (self.x, self.y))
+                window.blit(images.tornado[self.spin_count // 2], (self.x, self.y))
                 self.spin_count += 1
             if direction == "up":
                 self.y -= self.speed
                 self.range -= self.speed
-                window.blit(images.tornado[self.spin_count//2], (self.x, self.y))
+                window.blit(images.tornado[self.spin_count // 2], (self.x, self.y))
                 self.spin_count += 1
             if direction == "down":
                 self.y += self.speed
                 self.range -= self.speed
-                window.blit(images.tornado[self.spin_count//2], (self.x, self.y))
+                window.blit(images.tornado[self.spin_count // 2], (self.x, self.y))
                 self.spin_count += 1
         else:
             rules.tornados = []
@@ -243,7 +243,7 @@ def full_redraw(projectiles, tornados):
     rules.window.blit(images.bg, (0, 0))
 
     # Cooldown skill draw
-    cooldown = rules.font.render(f'{rules.tornado_ticker}', True, "black")
+    cooldown = rules.font.render(f"{rules.tornado_ticker}", True, "black")
     if rules.tornado_ticker == 0:
         rules.window.blit(images.tornado[0], (rules.screen_wight - 50, 50))
     else:
@@ -346,7 +346,7 @@ def full_redraw(projectiles, tornados):
             # Check if tornado hits enemy
             for t in tornados:
                 if (e.x + rules.mistake) > t["tornado"].x > (e.x - rules.mistake) and (
-                        e.y + rules.mistake
+                    e.y + rules.mistake
                 ) > t["tornado"].y > (e.y - rules.mistake):
                     try:
                         rules.enemies.remove(e)
@@ -355,8 +355,12 @@ def full_redraw(projectiles, tornados):
 
         # Draw ammo and ammo kit
         ammo_kit.redraw(rules.window)
-        ammo_text = rules.font_big.render(f"{rules.count_projectiles} / {rules.max_ammo}", True, "black")
-        rules.window.blit(ammo_text, (rules.screen_wight - 200, rules.screen_height - 100))
+        ammo_text = rules.font_big.render(
+            f"{rules.count_projectiles} / {rules.max_ammo}", True, "black"
+        )
+        rules.window.blit(
+            ammo_text, (rules.screen_wight - 200, rules.screen_height - 100)
+        )
     # Update window
     pygame.display.update()
 
@@ -616,10 +620,12 @@ def start_game():
                 direction = "up"
             if player.down:
                 direction = "down"
-            rules.tornados.append({
-                "tornado": tornado,
-                "direction": direction,
-            })
+            rules.tornados.append(
+                {
+                    "tornado": tornado,
+                    "direction": direction,
+                }
+            )
             rules.tornado_ticker = 1000
 
         # Spawn enemy

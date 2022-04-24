@@ -144,11 +144,14 @@ class Images:
         self.boomerang4 = pygame.transform.scale(
             pygame.image.load("static_files/boomerang/4.png"), (50, 50)
         )
-        self.tornado = [pygame.transform.scale(
-            pygame.image.load("static_files/tornado/1.png"), (50, 50)
-        ), pygame.transform.scale(
-            pygame.image.load("static_files/tornado/2.png"), (50, 50)
-        )]
+        self.tornado = [
+            pygame.transform.scale(
+                pygame.image.load("static_files/tornado/1.png"), (50, 50)
+            ),
+            pygame.transform.scale(
+                pygame.image.load("static_files/tornado/2.png"), (50, 50)
+            ),
+        ]
         self.tornado_bw = pygame.transform.scale(
             pygame.image.load("static_files/tornado/bw.png"), (50, 50)
         )
