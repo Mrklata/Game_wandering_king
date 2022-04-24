@@ -309,11 +309,13 @@ class Life(object):
 
 
 class GameOver(object):
+    """Game over text."""
     def __init__(self):
         self.x = rules.screen_wight // 2 - 250
         self.y = rules.screen_height // 2 - 100
 
     def redraw(self, window):
+        """Draw game over."""
         window.blit(images.game_over, (self.x, self.y))
 
 
@@ -331,10 +333,21 @@ def full_redraw(projectiles):
     rules.window.blit(images.bg, (0, 0))
     if hearth.count == 0:
         game_over.redraw(rules.window)
-        score = rules.font.render(f"You have scored {round(rules.score, 1)}", True, "black")
+        survive = rules.font.render(
+            f"You have survived {round(rules.score, 1)}", True, "black"
+        )
         kills = rules.font.render(f"And killed {rules.kills} robbers", True, "black")
-        rules.window.blit(score, (rules.screen_wight//2 - 100, rules.screen_height//2 + 100))
-        rules.window.blit(kills, (rules.screen_wight // 2 - 100, rules.screen_height // 2 + 120))
+        score = rules.font.render(f"Final score: {rules.kills + round(rules.score, 1)}", True, "black")
+        rules.window.blit(
+            survive, (rules.screen_wight // 2 - 100, rules.screen_height // 2 + 100)
+        )
+        rules.window.blit(
+            kills, (rules.screen_wight // 2 - 100, rules.screen_height // 2 + 120)
+        )
+        rules.window.blit(
+            score, (rules.screen_wight // 2 - 100, rules.screen_height // 2 + 140)
+        )
+
     elif hearth.count > 0:
         # Draw player
         player.redraw(rules.window)
@@ -440,10 +453,10 @@ def start_game():
         ):
             rules.count_projectiles = 5
             ammo_kit.x = random.randint(
-                rules.mistake, rules.screen_wight - rules.mistake*2
+                rules.mistake, rules.screen_wight - rules.mistake * 2
             )
             ammo_kit.y = random.randint(
-                rules.mistake, rules.screen_height - rules.mistake*2
+                rules.mistake, rules.screen_height - rules.mistake * 2
             )
 
         # No more lives
@@ -634,14 +647,19 @@ def start_game():
 
         # Spawn enemy
         if spawn_ticker == 0 and not game_over:
+            # Make sure enemy won't spawn too close to player
             x = random.randint(rules.mistake, rules.screen_wight - rules.mistake)
             y = random.randint(rules.mistake, rules.screen_height - rules.mistake)
-            if not (player.x + rules.mistake**2 >= x >= player.x + rules.mistake*2) and not (player.y + rules.mistake*2 >= y >= player.y + rules.mistake*2):
-                x += rules.mistake*2
-                y += rules.mistake*2
-                print("too close")
+            if not (
+                player.x + rules.mistake**2 >= x >= player.x + rules.mistake * 2
+            ) and not (
+                player.y + rules.mistake * 2 >= y >= player.y + rules.mistake * 2
+            ):
+                x += rules.mistake * 4
+                y += rules.mistake * 4
             enemy = Enemy(
-                x, y,
+                x,
+                y,
                 64,
                 64,
                 random.uniform(1, 2),
