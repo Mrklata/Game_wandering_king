@@ -16,11 +16,13 @@ class Rules:
         self.window = pygame.display.set_mode((self.screen_wight, self.screen_height))
         self.enemies = []
         self.projectiles = []
+        self.max_ammo = 5
         self.count_projectiles = 5
         self.mistake = 32
         self.score = 0.0
         self.kills = 0
         self.font = pygame.font.SysFont("Times New Roman", 18)
+        self.font_big = pygame.font.SysFont("Times New Roman", 50)
 
 
 class Images:
@@ -241,28 +243,6 @@ class Projectile(object):
                 window.blit(images.arrow_down, (self.x, self.y))
 
 
-class Ammo(object):
-    """Ammo and all its information."""
-
-    def __init__(self):
-        self.x = rules.screen_wight - 200
-        self.y = rules.screen_height - 200
-
-    def redraw(self, window):
-        """Draw ammo."""
-        window.blit(images.ammo, (self.x, self.y))
-        if rules.count_projectiles == 1:
-            window.blit(images.a1, (self.x, self.y))
-        if rules.count_projectiles == 2:
-            window.blit(images.a2, (self.x, self.y))
-        if rules.count_projectiles == 3:
-            window.blit(images.a3, (self.x, self.y))
-        if rules.count_projectiles == 4:
-            window.blit(images.a4, (self.x, self.y))
-        if rules.count_projectiles == 5:
-            window.blit(images.a5, (self.x, self.y))
-
-
 class AmmoKit(object):
     """Ammo kit and all its information."""
 
@@ -310,6 +290,7 @@ class Life(object):
 
 class GameOver(object):
     """Game over text."""
+
     def __init__(self):
         self.x = rules.screen_wight // 2 - 250
         self.y = rules.screen_height // 2 - 100
@@ -321,7 +302,6 @@ class GameOver(object):
 
 # Creating player, ammo and ammo kit
 player = Player(200, 200, 64, 64)
-ammo = Ammo()
 ammo_kit = AmmoKit(rules.screen_wight // 2, rules.screen_height // 2)
 hearth = Life()
 game_over = GameOver()
@@ -337,7 +317,9 @@ def full_redraw(projectiles):
             f"You have survived {round(rules.score, 1)}", True, "black"
         )
         kills = rules.font.render(f"And killed {rules.kills} robbers", True, "black")
-        score = rules.font.render(f"Final score: {rules.kills + round(rules.score, 1)}", True, "black")
+        score = rules.font.render(
+            f"Final score: {rules.kills + round(rules.score, 1)}", True, "black"
+        )
         rules.window.blit(
             survive, (rules.screen_wight // 2 - 100, rules.screen_height // 2 + 100)
         )
@@ -392,7 +374,8 @@ def full_redraw(projectiles):
             ):
                 hearth.count -= 1
                 rules.enemies = []
-                rules.count_projectiles = 5
+                rules.max_ammo += 5
+                rules.count_projectiles = rules.max_ammo
             # Draw enemies
             e.redraw(rules.window)
 
@@ -411,14 +394,16 @@ def full_redraw(projectiles):
 
         # Draw ammo and ammo kit
         ammo_kit.redraw(rules.window)
-        ammo.redraw(rules.window)
-
+        ammo_text = rules.font_big.render(f"{rules.count_projectiles} / {rules.max_ammo}", True, "black")
+        rules.window.blit(ammo_text, (rules.screen_wight - 200, rules.screen_height - 100))
     # Update window
     pygame.display.update()
 
 
 def start_game():
     """Start game"""
+    first_upgrade = False
+    second_upgrade = False
     ticker = 0
     spawn_ticker = 50
     game_over = False
@@ -428,17 +413,23 @@ def start_game():
     while run:
         rules.clock.tick(27)
 
-        # Tick for ammo
+        # Ticks
         if ticker > 0:
             ticker -= 1
-
-        # Tick for spawning enemies
         if spawn_ticker > 0:
             spawn_ticker -= 1
 
         # Score count
         if not game_over:
             rules.score += 0.1
+
+        # Upgrade ammo
+        if rules.kills == 50 and not first_upgrade:
+            rules.max_ammo += 5
+            first_upgrade = True
+        if rules.kills == 100 and not second_upgrade:
+            rules.max_ammo += 5
+            second_upgrade = True
 
         # Game quit
         for event in pygame.event.get():
@@ -451,7 +442,7 @@ def start_game():
         ) and (ammo_kit.y + rules.mistake // 2) >= player.y >= (
             ammo_kit.y - rules.mistake * 2
         ):
-            rules.count_projectiles = 5
+            rules.count_projectiles = rules.max_ammo
             ammo_kit.x = random.randint(
                 rules.mistake, rules.screen_wight - rules.mistake * 2
             )
@@ -650,15 +641,13 @@ def start_game():
             # Make sure enemy won't spawn too close to player
             x = random.randint(rules.mistake, rules.screen_wight - rules.mistake)
             y = random.randint(rules.mistake, rules.screen_height - rules.mistake)
-            if (
-                player.x + rules.mistake * 2 >= x >= player.x - rules.mistake * 2
-            ) and (
+            if (player.x + rules.mistake * 2 >= x >= player.x - rules.mistake * 2) and (
                 player.y + rules.mistake * 2 >= y >= player.y - rules.mistake * 2
             ):
                 if player.x > 600:
-                    x -= rules.mistake * 3
+                    x -= rules.mistake * 5
                 if player.x < 600:
-                    x += rules.mistake * 3
+                    x += rules.mistake * 5
             enemy = Enemy(
                 x,
                 y,

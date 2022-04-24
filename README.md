@@ -7,6 +7,9 @@ Rules are simple, don't get caught by robbers:<hr>
  - **AMMO KIT** change location when collected
  - You have three **LIVES** in the game, you lose one every time robber touches you
  - **LIVES** are visible in upper-left corner<hr>
+# Upgrades
+ - When you kill 50 and 100 enemies you gain **+5** ammo capacity
+ - When you die you also gain **+5** ammo capacity<hr>
  Images used in game may be licensed please use only for personal purposes<hr>
  # Ammo Kit
 ![ammokit](https://user-images.githubusercontent.com/58168326/164974962-f25b3d99-e19b-4060-bcfe-3a6cef2dadf1.png)
