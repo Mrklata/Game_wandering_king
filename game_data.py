@@ -13,6 +13,7 @@ class Rules:
         self.projectiles = []
         self.tornados = []
         self.tornado_ticker = 0
+        self.freeze_ticker = 0
         self.max_ammo = 5
         self.count_projectiles = 5
         self.mistake = 32
@@ -20,6 +21,10 @@ class Rules:
         self.kills = 0
         self.font = pygame.font.SysFont("Times New Roman", 18)
         self.font_big = pygame.font.SysFont("Times New Roman", 50)
+        self.spawn_ticker = 50
+        self.enemy_frozen_ticker = 0
+        self.explosive_ammo = 0
+        self.explosive_ammo_ticker = 0
 
 
 class Images:
@@ -128,6 +133,9 @@ class Images:
         self.enemy = pygame.transform.scale(
             pygame.image.load("static_files/enemy.png"), (64, 64)
         )
+        self.enemy_frozen = pygame.transform.scale(
+            pygame.image.load("static_files/enemy_frozen.png"), (64, 64)
+        )
         self.hearth_3 = pygame.image.load("static_files/life/3.png")
         self.hearth_2 = pygame.image.load("static_files/life/2.png")
         self.hearth_1 = pygame.image.load("static_files/life/1.png")
@@ -146,12 +154,68 @@ class Images:
         )
         self.tornado = [
             pygame.transform.scale(
-                pygame.image.load("static_files/tornado/1.png"), (50, 50)
+                pygame.image.load("static_files/tornado/1.png"), (80, 80)
             ),
             pygame.transform.scale(
-                pygame.image.load("static_files/tornado/2.png"), (50, 50)
+                pygame.image.load("static_files/tornado/2.png"), (80, 80)
             ),
         ]
+        self.tornado_small = pygame.transform.scale(
+            pygame.image.load("static_files/tornado/1.png"), (50, 50)
+        )
         self.tornado_bw = pygame.transform.scale(
             pygame.image.load("static_files/tornado/bw.png"), (50, 50)
+        )
+        self.snow = pygame.transform.scale(
+            pygame.image.load("static_files/snow/1.png"), (50, 50)
+        )
+        self.snow_bw = pygame.transform.scale(
+            pygame.image.load("static_files/snow/bw.png"), (50, 50)
+        )
+        self.explosion_small = pygame.transform.scale(
+            pygame.image.load("static_files/explosion/1.png"), (50, 50)
+        )
+        self.explosion1 = pygame.transform.scale(
+            pygame.image.load("static_files/explosion/1.png"), (200, 200)
+        )
+        self.explosion2 = pygame.transform.scale(
+            pygame.image.load("static_files/explosion/2.png"), (200, 200)
+        )
+        self.explosion3 = pygame.transform.scale(
+            pygame.image.load("static_files/explosion/3.png"), (200, 200)
+        )
+        self.explosion4 = pygame.transform.scale(
+            pygame.image.load("static_files/explosion/4.png"), (200, 200)
+        )
+        self.explosion5 = pygame.transform.scale(
+            pygame.image.load("static_files/explosion/5.png"), (200, 200)
+        )
+        self.explosion6 = pygame.transform.scale(
+            pygame.image.load("static_files/explosion/6.png"), (200, 200)
+        )
+        self.explosion7 = pygame.transform.scale(
+            pygame.image.load("static_files/explosion/7.png"), (200, 200)
+        )
+        self.explosion8 = pygame.transform.scale(
+            pygame.image.load("static_files/explosion/8.png"), (200, 200)
+        )
+        self.explosion9 = pygame.transform.scale(
+            pygame.image.load("static_files/explosion/9.png"), (200, 200)
+        )
+        self.bomb = [
+            pygame.transform.scale(
+                pygame.image.load("static_files/bomb/1.png"), (50, 50)
+            ),
+            pygame.transform.scale(
+                pygame.image.load("static_files/bomb/2.png"), (50, 50)
+            ),
+            pygame.transform.scale(
+                pygame.image.load("static_files/bomb/3.png"), (50, 50)
+            ),
+            pygame.transform.scale(
+                pygame.image.load("static_files/bomb/4.png"), (50, 50)
+            ),
+        ]
+        self.explosion_bw = pygame.transform.scale(
+            pygame.image.load("static_files/explosion/bw.png"), (50, 50)
         )

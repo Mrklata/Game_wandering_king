@@ -52,6 +52,7 @@ class Player(object):
         if self.left_up:
             window.blit(images.walk_left_up[self.walk_count // 6], (self.x, self.y))
             self.walk_count += 3
+
         if self.left_down:
             window.blit(images.walk_left_down[self.walk_count // 6], (self.x, self.y))
             self.walk_count += 3
@@ -77,38 +78,80 @@ class Projectile(object):
         self.wight = wight
         self.height = height
         self.speed = 20
+        self.roll = 0
 
     def redraw(self, window, direction):
         """Draw projectile."""
-        if 0 < self.x < rules.screen_wight and 0 < self.y < rules.screen_height:
-            if direction == "left":
-                self.x -= self.speed
-                window.blit(images.arrow_left, (self.x, self.y))
-            if direction == "left_up":
-                self.x -= self.speed
-                self.y -= self.speed
-                window.blit(images.arrow_left_up, (self.x, self.y))
-            if direction == "left_down":
-                self.x -= self.speed
-                self.y += self.speed
-                window.blit(images.arrow_left_down, (self.x, self.y))
-            if direction == "right":
-                self.x += self.speed
-                window.blit(images.arrow_right, (self.x, self.y))
-            if direction == "right_up":
-                self.x += self.speed
-                self.y -= self.speed
-                window.blit(images.arrow_right_up, (self.x, self.y))
-            if direction == "right_down":
-                self.x += self.speed
-                self.y += self.speed
-                window.blit(images.arrow_right_down, (self.x, self.y))
-            if direction == "up":
-                self.y -= self.speed
-                window.blit(images.arrow_up, (self.x, self.y))
-            if direction == "down":
-                self.y += self.speed
-                window.blit(images.arrow_down, (self.x, self.y))
+        if rules.explosive_ammo == 0:
+            if 0 < self.x < rules.screen_wight and 0 < self.y < rules.screen_height:
+                if direction == "left":
+                    self.x -= self.speed
+                    window.blit(images.arrow_left, (self.x, self.y))
+                if direction == "left_up":
+                    self.x -= self.speed
+                    self.y -= self.speed
+                    window.blit(images.arrow_left_up, (self.x, self.y))
+                if direction == "left_down":
+                    self.x -= self.speed
+                    self.y += self.speed
+                    window.blit(images.arrow_left_down, (self.x, self.y))
+                if direction == "right":
+                    self.x += self.speed
+                    window.blit(images.arrow_right, (self.x, self.y))
+                if direction == "right_up":
+                    self.x += self.speed
+                    self.y -= self.speed
+                    window.blit(images.arrow_right_up, (self.x, self.y))
+                if direction == "right_down":
+                    self.x += self.speed
+                    self.y += self.speed
+                    window.blit(images.arrow_right_down, (self.x, self.y))
+                if direction == "up":
+                    self.y -= self.speed
+                    window.blit(images.arrow_up, (self.x, self.y))
+                if direction == "down":
+                    self.y += self.speed
+                    window.blit(images.arrow_down, (self.x, self.y))
+        if rules.explosive_ammo > 0:
+            if 0 < self.x < rules.screen_wight and 0 < self.y < rules.screen_height:
+                if self.roll + 1 >= 8:
+                    self.roll = 0
+                if direction == "left":
+                    self.x -= self.speed / 2
+                    window.blit(images.bomb[self.roll // 2], (self.x, self.y))
+                    self.roll += 1
+                if direction == "left_up":
+                    self.x -= self.speed / 2
+                    self.y -= self.speed / 2
+                    window.blit(images.bomb[self.roll // 2], (self.x, self.y))
+                    self.roll += 1
+                if direction == "left_down":
+                    self.x -= self.speed / 2
+                    self.y += self.speed / 2
+                    window.blit(images.bomb[self.roll // 2], (self.x, self.y))
+                    self.roll += 1
+                if direction == "right":
+                    self.x += self.speed / 2
+                    window.blit(images.bomb[self.roll // 2], (self.x, self.y))
+                    self.roll += 1
+                if direction == "right_up":
+                    self.x += self.speed / 2
+                    self.y -= self.speed / 2
+                    window.blit(images.bomb[self.roll // 2], (self.x, self.y))
+                    self.roll += 1
+                if direction == "right_down":
+                    self.x += self.speed / 2
+                    self.y += self.speed / 2
+                    window.blit(images.bomb[self.roll // 2], (self.x, self.y))
+                    self.roll += 1
+                if direction == "up":
+                    self.y -= self.speed / 2
+                    window.blit(images.bomb[self.roll // 2], (self.x, self.y))
+                    self.roll += 1
+                if direction == "down":
+                    self.y += self.speed / 2
+                    window.blit(images.bomb[self.roll // 2], (self.x, self.y))
+                    self.roll += 1
 
 
 class Tornado(object):
@@ -173,6 +216,38 @@ class Tornado(object):
             rules.tornados = []
 
 
+class Explosion(object):
+    """Explosion and all its information."""
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.wight = 100
+        self.height = 100
+        self.animation = 17
+
+    def redraw(self, window):
+        """Draw explosion."""
+        if self.animation in [17, 16]:
+            window.blit(images.explosion1, (self.x, self.y))
+        if self.animation in [15, 14]:
+            window.blit(images.explosion2, (self.x, self.y))
+        if self.animation in [13, 12]:
+            window.blit(images.explosion3, (self.x, self.y))
+        if self.animation in [11, 10]:
+            window.blit(images.explosion4, (self.x, self.y))
+        if self.animation in [9, 8]:
+            window.blit(images.explosion5, (self.x, self.y))
+        if self.animation in [7, 6]:
+            window.blit(images.explosion6, (self.x, self.y))
+        if self.animation in [5, 4]:
+            window.blit(images.explosion7, (self.x, self.y))
+        if self.animation in [3, 2]:
+            window.blit(images.explosion8, (self.x, self.y))
+        if self.animation in [1, 0]:
+            window.blit(images.explosion9, (self.x, self.y))
+
+
 class AmmoKit(object):
     """Ammo kit and all its information."""
 
@@ -197,7 +272,10 @@ class Enemy(object):
 
     def redraw(self, window):
         """Draw enemy"""
-        window.blit(images.enemy, (self.x, self.y))
+        if rules.enemy_frozen_ticker == 0:
+            window.blit(images.enemy, (self.x, self.y))
+        else:
+            window.blit(images.enemy_frozen, (self.x, self.y))
 
 
 class Life(object):
@@ -235,6 +313,7 @@ player = Player(200, 200, 64, 64)
 ammo_kit = AmmoKit(rules.screen_wight // 2, rules.screen_height // 2)
 hearth = Life()
 game_over = GameOver()
+explosions = []
 
 
 def full_redraw(projectiles, tornados):
@@ -242,14 +321,7 @@ def full_redraw(projectiles, tornados):
     # Draw background
     rules.window.blit(images.bg, (0, 0))
 
-    # Cooldown skill draw
-    cooldown = rules.font.render(f"{rules.tornado_ticker}", True, "black")
-    if rules.tornado_ticker == 0:
-        rules.window.blit(images.tornado[0], (rules.screen_wight - 50, 50))
-    else:
-        rules.window.blit(images.tornado_bw, (rules.screen_wight - 50, 50))
-    rules.window.blit(cooldown, (rules.screen_wight - 50, 100))
-
+    # End game
     if hearth.count == 0:
         game_over.redraw(rules.window)
         survive = rules.font.render(
@@ -270,8 +342,28 @@ def full_redraw(projectiles, tornados):
         )
 
     elif hearth.count > 0:
-        # Draw player
-        player.redraw(rules.window)
+
+        # Cooldown skill draw
+        cooldown_tornado = rules.font.render(f"{rules.tornado_ticker}", True, "black")
+        cooldown_snow = rules.font.render(f"{rules.freeze_ticker}", True, "black")
+        cooldown_explosion = rules.font.render(
+            f"{rules.explosive_ammo_ticker}", True, "black"
+        )
+        if rules.tornado_ticker == 0:
+            rules.window.blit(images.tornado_small, (rules.screen_wight - 50, 50))
+        else:
+            rules.window.blit(images.tornado_bw, (rules.screen_wight - 50, 50))
+        rules.window.blit(cooldown_tornado, (rules.screen_wight - 50, 100))
+        if rules.freeze_ticker == 0:
+            rules.window.blit(images.snow, (rules.screen_wight - 50, 150))
+        else:
+            rules.window.blit(images.snow_bw, (rules.screen_wight - 50, 150))
+        rules.window.blit(cooldown_snow, (rules.screen_wight - 50, 200))
+        if rules.explosive_ammo_ticker == 0:
+            rules.window.blit(images.explosion_small, (rules.screen_wight - 50, 250))
+        else:
+            rules.window.blit(images.explosion_bw, (rules.screen_wight - 50, 250))
+        rules.window.blit(cooldown_explosion, (rules.screen_wight - 50, 300))
 
         # Draw hearths
         hearth.redraw(rules.window)
@@ -297,26 +389,29 @@ def full_redraw(projectiles, tornados):
 
         # Loop for changing enemies positions
         for e in rules.enemies:
-            if e.x > player.x and e.y > player.y:
-                e.x -= e.speed
-                e.y -= e.speed
-            if e.x > player.x and e.y < player.y:
-                e.x -= e.speed
-                e.y += e.speed
-            if e.x < player.x and e.y < player.y:
-                e.x += e.speed
-                e.y += e.speed
-            if e.x < player.x and e.y > player.y:
-                e.x += e.speed
-                e.y -= e.speed
-            if e.x == player.x and e.y < player.y:
-                e.y += e.speed
-            if e.x == player.x and e.y > player.y:
-                e.y -= e.speed
-            if e.x > player.x and e.y == player.y:
-                e.x -= e.speed
-            if e.x < player.x and e.y == player.y:
-                e.x += e.speed
+
+            # Move when not frozen
+            if rules.enemy_frozen_ticker == 0:
+                if e.x > player.x and e.y > player.y:
+                    e.x -= e.speed
+                    e.y -= e.speed
+                if e.x > player.x and e.y < player.y:
+                    e.x -= e.speed
+                    e.y += e.speed
+                if e.x < player.x and e.y < player.y:
+                    e.x += e.speed
+                    e.y += e.speed
+                if e.x < player.x and e.y > player.y:
+                    e.x += e.speed
+                    e.y -= e.speed
+                if e.x == player.x and e.y < player.y:
+                    e.y += e.speed
+                if e.x == player.x and e.y > player.y:
+                    e.y -= e.speed
+                if e.x > player.x and e.y == player.y:
+                    e.x -= e.speed
+                if e.x < player.x and e.y == player.y:
+                    e.x += e.speed
             # Draw enemies
             e.redraw(rules.window)
 
@@ -324,34 +419,59 @@ def full_redraw(projectiles, tornados):
             if (
                 player.x + rules.mistake >= e.x >= player.x - rules.mistake
                 and player.y + rules.mistake >= e.y >= player.y - rules.mistake
-            ):
+            ) and rules.enemy_frozen_ticker == 0:
                 hearth.count -= 1
                 rules.enemies = []
                 rules.max_ammo += 5
                 rules.count_projectiles = rules.max_ammo
+                rules.explosive_ammo = 0
 
             # Check if projectile hit enemy, remove both when hit
             for p in projectiles:
                 if (e.x + rules.mistake) > p["arrow"].x > (e.x - rules.mistake) and (
                     e.y + rules.mistake
                 ) > p["arrow"].y > (e.y - rules.mistake):
-                    projectiles.remove(p)
+
                     rules.kills += 1
                     # Sometimes if two projectiles hit one enemy it tried to remove same enemy twice
+                    if rules.explosive_ammo == 0:
+                        projectiles.remove(p)
+                        try:
+                            rules.enemies.remove(e)
+                        except ValueError:
+                            print("Same enemy hit twice")
+                    if rules.explosive_ammo > 0:
+                        explosion = Explosion(p["arrow"].x - 50, p["arrow"].y - 50)
+                        explosions.append(explosion)
+                        projectiles.remove(p)
+
+            for explode in explosions:
+                if (e.x + rules.mistake) > explode.x > (
+                    e.x - (rules.mistake + 200)
+                ) and (e.y + rules.mistake) > explode.y > (e.y - (rules.mistake + 200)):
+                    try:
+                        rules.enemies.remove(e)
+                    except ValueError:
+                        print("Same enemy hit twice")
+            # Check if tornado hits enemy
+            for t in tornados:
+                if (e.x + rules.mistake * 2) > t["tornado"].x > (
+                    e.x - rules.mistake * 2
+                ) and (e.y + rules.mistake * 2) > t["tornado"].y > (
+                    e.y - rules.mistake * 2
+                ):
                     try:
                         rules.enemies.remove(e)
                     except ValueError:
                         print("Same enemy hit twice")
 
-            # Check if tornado hits enemy
-            for t in tornados:
-                if (e.x + rules.mistake) > t["tornado"].x > (e.x - rules.mistake) and (
-                    e.y + rules.mistake
-                ) > t["tornado"].y > (e.y - rules.mistake):
-                    try:
-                        rules.enemies.remove(e)
-                    except ValueError:
-                        print("Same enemy hit twice")
+        # Draw explosions
+        for explode in explosions:
+            if explode.animation >= 2:
+                explode.redraw(rules.window)
+                explode.animation -= 1
+            if explode.animation < 2:
+                explosions.remove(explode)
 
         # Draw ammo and ammo kit
         ammo_kit.redraw(rules.window)
@@ -361,6 +481,9 @@ def full_redraw(projectiles, tornados):
         rules.window.blit(
             ammo_text, (rules.screen_wight - 200, rules.screen_height - 100)
         )
+        # Draw player
+        player.redraw(rules.window)
+
     # Update window
     pygame.display.update()
 
@@ -370,7 +493,6 @@ def start_game():
     first_upgrade = False
     second_upgrade = False
     ticker = 0
-    spawn_ticker = 50
     game_over = False
     run = True
 
@@ -381,10 +503,17 @@ def start_game():
         # Ticks
         if ticker > 0:
             ticker -= 1
-        if spawn_ticker > 0:
-            spawn_ticker -= 1
+        if rules.spawn_ticker > 0:
+            rules.spawn_ticker -= 1
         if rules.tornado_ticker > 0:
             rules.tornado_ticker -= 1
+        if rules.freeze_ticker > 0:
+            rules.freeze_ticker -= 1
+        if rules.enemy_frozen_ticker > 0:
+            rules.enemy_frozen_ticker -= 1
+        if rules.explosive_ammo_ticker > 0:
+            rules.explosive_ammo_ticker -= 1
+
         # Score count
         if not game_over:
             rules.score += 0.1
@@ -601,7 +730,11 @@ def start_game():
                         "direction": direction,
                     }
                 )
-        if keys[pygame.K_w] and rules.tornado_ticker == 0 and not player.standing:
+            if rules.explosive_ammo > 0:
+                rules.explosive_ammo -= 1
+
+        # Tornado skill
+        if keys[pygame.K_q] and rules.tornado_ticker == 0 and not player.standing:
             tornado = Tornado(player.x, player.y)
             direction = None
             if player.right:
@@ -628,18 +761,33 @@ def start_game():
             )
             rules.tornado_ticker = 1000
 
+        # Freeze skill
+        if keys[pygame.K_w] and rules.freeze_ticker == 0 and not player.standing:
+            rules.enemy_frozen_ticker = 125
+            rules.freeze_ticker = 3000
+
+        # Explosive arrow skill
+        if (
+            keys[pygame.K_e]
+            and rules.explosive_ammo_ticker == 0
+            and not player.standing
+        ):
+            rules.explosive_ammo = rules.max_ammo + 1
+            rules.explosive_ammo_ticker = 5000
+            rules.count_projectiles = rules.max_ammo
+
         # Spawn enemy
-        if spawn_ticker == 0 and not game_over:
+        if rules.spawn_ticker == 0 and not game_over and rules.enemy_frozen_ticker == 0:
             # Make sure enemy won't spawn too close to player
             x = random.randint(rules.mistake, rules.screen_wight - rules.mistake)
             y = random.randint(rules.mistake, rules.screen_height - rules.mistake)
-            if (player.x + rules.mistake * 2 >= x >= player.x - rules.mistake * 2) and (
-                player.y + rules.mistake * 2 >= y >= player.y - rules.mistake * 2
+            if (player.x + rules.mistake * 3 >= x >= player.x - rules.mistake * 3) and (
+                player.y + rules.mistake * 3 >= y >= player.y - rules.mistake * 3
             ):
                 if player.x > 600:
-                    x -= rules.mistake * 5
+                    x -= rules.mistake * 6
                 if player.x < 600:
-                    x += rules.mistake * 5
+                    x += rules.mistake * 6
             enemy = Enemy(
                 x,
                 y,
@@ -648,6 +796,6 @@ def start_game():
                 random.uniform(1, 2),
             )
             rules.enemies.append(enemy)
-            spawn_ticker = 20
+            rules.spawn_ticker = 20
 
         full_redraw(rules.projectiles, rules.tornados)
