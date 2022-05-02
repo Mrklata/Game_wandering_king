@@ -5,8 +5,9 @@ class Rules:
     """General information about the game."""
 
     def __init__(self):
+        self.arrow_ticker = 10
         self.clock = pygame.time.Clock()
-        self.screen_wight = 1500
+        self.screen_wight = 1600
         self.screen_height = 900
         self.window = pygame.display.set_mode((self.screen_wight, self.screen_height))
         self.enemies = []
@@ -25,108 +26,107 @@ class Rules:
         self.enemy_frozen_ticker = 0
         self.explosive_ammo = 0
         self.explosive_ammo_ticker = 0
+        self.zombie_spawn = 0
+        self.level = 1
+        self.game_over = False
 
 
 class Images:
     """All images."""
 
     def __init__(self):
-        self.walk_left = [
-            pygame.image.load("static_files/walk_left/1.png"),
-            pygame.image.load("static_files/walk_left/2.png"),
-            pygame.image.load("static_files/walk_left/3.png"),
-            pygame.image.load("static_files/walk_left/4.png"),
-            pygame.image.load("static_files/walk_left/5.png"),
-            pygame.image.load("static_files/walk_left/6.png"),
-        ]
-        self.walk_left_up = [
-            pygame.image.load("static_files/walk_left_up/1.png"),
-            pygame.image.load("static_files/walk_left_up/2.png"),
-            pygame.image.load("static_files/walk_left_up/3.png"),
-            pygame.image.load("static_files/walk_left_up/4.png"),
-            pygame.image.load("static_files/walk_left_up/5.png"),
-            pygame.image.load("static_files/walk_left_up/6.png"),
-        ]
-        self.walk_left_down = [
-            pygame.image.load("static_files/walk_left_down/1.png"),
-            pygame.image.load("static_files/walk_left_down/2.png"),
-            pygame.image.load("static_files/walk_left_down/3.png"),
-            pygame.image.load("static_files/walk_left_down/4.png"),
-            pygame.image.load("static_files/walk_left_down/5.png"),
-            pygame.image.load("static_files/walk_left_down/6.png"),
-        ]
-        self.walk_right = [
-            pygame.image.load("static_files/walk_right/1.png"),
-            pygame.image.load("static_files/walk_right/2.png"),
-            pygame.image.load("static_files/walk_right/3.png"),
-            pygame.image.load("static_files/walk_right/4.png"),
-            pygame.image.load("static_files/walk_right/5.png"),
-            pygame.image.load("static_files/walk_right/6.png"),
-        ]
-        self.walk_right_up = [
-            pygame.image.load("static_files/walk_right_up/1.png"),
-            pygame.image.load("static_files/walk_right_up/2.png"),
-            pygame.image.load("static_files/walk_right_up/3.png"),
-            pygame.image.load("static_files/walk_right_up/4.png"),
-            pygame.image.load("static_files/walk_right_up/5.png"),
-            pygame.image.load("static_files/walk_right_up/6.png"),
-        ]
-        self.walk_right_down = [
-            pygame.image.load("static_files/walk_right_down/1.png"),
-            pygame.image.load("static_files/walk_right_down/2.png"),
-            pygame.image.load("static_files/walk_right_down/3.png"),
-            pygame.image.load("static_files/walk_right_down/4.png"),
-            pygame.image.load("static_files/walk_right_down/5.png"),
-            pygame.image.load("static_files/walk_right_down/6.png"),
-        ]
-        self.walk_up = [
-            pygame.image.load("static_files/walk_up/1.png"),
-            pygame.image.load("static_files/walk_up/2.png"),
-            pygame.image.load("static_files/walk_up/3.png"),
-            pygame.image.load("static_files/walk_up/4.png"),
-            pygame.image.load("static_files/walk_up/5.png"),
-            pygame.image.load("static_files/walk_up/6.png"),
-        ]
-        self.walk_down = [
-            pygame.image.load("static_files/walk_down/1.png"),
-            pygame.image.load("static_files/walk_down/2.png"),
-            pygame.image.load("static_files/walk_down/3.png"),
-            pygame.image.load("static_files/walk_down/4.png"),
-            pygame.image.load("static_files/walk_down/5.png"),
-            pygame.image.load("static_files/walk_down/6.png"),
-        ]
+        self.walk = {
+            "left": [
+                pygame.image.load("static_files/walk_left/1.png"),
+                pygame.image.load("static_files/walk_left/2.png"),
+                pygame.image.load("static_files/walk_left/3.png"),
+                pygame.image.load("static_files/walk_left/4.png"),
+                pygame.image.load("static_files/walk_left/5.png"),
+                pygame.image.load("static_files/walk_left/6.png"),
+            ],
+            "left_up": [
+                pygame.image.load("static_files/walk_left_up/1.png"),
+                pygame.image.load("static_files/walk_left_up/2.png"),
+                pygame.image.load("static_files/walk_left_up/3.png"),
+                pygame.image.load("static_files/walk_left_up/4.png"),
+                pygame.image.load("static_files/walk_left_up/5.png"),
+                pygame.image.load("static_files/walk_left_up/6.png"),
+            ],
+            "left_down": [
+                pygame.image.load("static_files/walk_left_down/1.png"),
+                pygame.image.load("static_files/walk_left_down/2.png"),
+                pygame.image.load("static_files/walk_left_down/3.png"),
+                pygame.image.load("static_files/walk_left_down/4.png"),
+                pygame.image.load("static_files/walk_left_down/5.png"),
+                pygame.image.load("static_files/walk_left_down/6.png"),
+            ],
+            "right": [
+                pygame.image.load("static_files/walk_right/1.png"),
+                pygame.image.load("static_files/walk_right/2.png"),
+                pygame.image.load("static_files/walk_right/3.png"),
+                pygame.image.load("static_files/walk_right/4.png"),
+                pygame.image.load("static_files/walk_right/5.png"),
+                pygame.image.load("static_files/walk_right/6.png"),
+            ],
+            "right_up": [
+                pygame.image.load("static_files/walk_right_up/1.png"),
+                pygame.image.load("static_files/walk_right_up/2.png"),
+                pygame.image.load("static_files/walk_right_up/3.png"),
+                pygame.image.load("static_files/walk_right_up/4.png"),
+                pygame.image.load("static_files/walk_right_up/5.png"),
+                pygame.image.load("static_files/walk_right_up/6.png"),
+            ],
+            "right_down": [
+                pygame.image.load("static_files/walk_right_down/1.png"),
+                pygame.image.load("static_files/walk_right_down/2.png"),
+                pygame.image.load("static_files/walk_right_down/3.png"),
+                pygame.image.load("static_files/walk_right_down/4.png"),
+                pygame.image.load("static_files/walk_right_down/5.png"),
+                pygame.image.load("static_files/walk_right_down/6.png"),
+            ],
+            "up": [
+                pygame.image.load("static_files/walk_up/1.png"),
+                pygame.image.load("static_files/walk_up/2.png"),
+                pygame.image.load("static_files/walk_up/3.png"),
+                pygame.image.load("static_files/walk_up/4.png"),
+                pygame.image.load("static_files/walk_up/5.png"),
+                pygame.image.load("static_files/walk_up/6.png"),
+            ],
+            "down": [
+                pygame.image.load("static_files/walk_down/1.png"),
+                pygame.image.load("static_files/walk_down/2.png"),
+                pygame.image.load("static_files/walk_down/3.png"),
+                pygame.image.load("static_files/walk_down/4.png"),
+                pygame.image.load("static_files/walk_down/5.png"),
+                pygame.image.load("static_files/walk_down/6.png"),
+            ],
+        }
         self.standing = pygame.image.load("static_files/walk_down/1.png")
         self.bg = pygame.image.load("static_files/bg_pro.png")
         self.arrow_left = pygame.transform.scale(
-            pygame.image.load("static_files/AL.png"), (50, 50)
+            pygame.image.load("static_files/arrow/AL.png"), (50, 50)
         )
         self.arrow_left_up = pygame.transform.scale(
-            pygame.image.load("static_files/ALU.png"), (25, 25)
+            pygame.image.load("static_files/arrow/ALU.png"), (25, 25)
         )
         self.arrow_left_down = pygame.transform.scale(
-            pygame.image.load("static_files/ALD.png"), (25, 25)
+            pygame.image.load("static_files/arrow/ALD.png"), (25, 25)
         )
         self.arrow_right = pygame.transform.scale(
-            pygame.image.load("static_files/AR.png"), (50, 50)
+            pygame.image.load("static_files/arrow/AR.png"), (50, 50)
         )
         self.arrow_right_up = pygame.transform.scale(
-            pygame.image.load("static_files/ARU.png"), (25, 25)
+            pygame.image.load("static_files/arrow/ARU.png"), (25, 25)
         )
         self.arrow_right_down = pygame.transform.scale(
-            pygame.image.load("static_files/ARD.png"), (25, 25)
+            pygame.image.load("static_files/arrow/ARD.png"), (25, 25)
         )
         self.arrow_up = pygame.transform.scale(
-            pygame.image.load("static_files/AU.png"), (50, 50)
+            pygame.image.load("static_files/arrow/AU.png"), (50, 50)
         )
         self.arrow_down = pygame.transform.scale(
-            pygame.image.load("static_files/AD.png"), (50, 50)
+            pygame.image.load("static_files/arrow/AD.png"), (50, 50)
         )
-        self.ammo = pygame.image.load("static_files/ammo.png")
-        self.a1 = pygame.image.load("static_files/a1.png")
-        self.a2 = pygame.image.load("static_files/a2.png")
-        self.a3 = pygame.image.load("static_files/a3.png")
-        self.a4 = pygame.image.load("static_files/a4.png")
-        self.a5 = pygame.image.load("static_files/a5.png")
         self.ammo_kit = pygame.transform.scale(
             pygame.image.load("static_files/ammokit.png"), (40, 40)
         )
@@ -219,3 +219,39 @@ class Images:
         self.explosion_bw = pygame.transform.scale(
             pygame.image.load("static_files/explosion/bw.png"), (50, 50)
         )
+
+
+def check_direction(player):
+    if player.right:
+        return "right"
+    if player.right_up:
+        return "right_up"
+    if player.right_down:
+        return "right_down"
+    if player.left:
+        return "left"
+    if player.left_up:
+        return "left_up"
+    if player.left_down:
+        return "left_down"
+    if player.up:
+        return "up"
+    if player.down:
+        return "down"
+    else:
+        return None
+
+
+def arrow_shot(player, rules, projectile):
+    rules.arrow_ticker = 10
+    direction = check_direction(player)
+    if rules.count_projectiles > 0:
+        rules.count_projectiles -= 1
+        rules.projectiles.append(
+            {
+                "arrow": projectile(player.x, player.y, 20, 20),
+                "direction": direction,
+            }
+        )
+    if rules.explosive_ammo > 0:
+        rules.explosive_ammo -= 1

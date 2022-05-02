@@ -1,9 +1,13 @@
 import random
 import pygame
-
-from game_data import Images, Rules
+from pygame.locals import *
+from game_data import Images, Rules, check_direction, arrow_shot
 
 pygame.init()
+
+# Adding joystick
+pygame.joystick.init()
+joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
 
 # Adding game title and creating images and rules
 pygame.display.set_caption("Wandering King")
@@ -30,6 +34,12 @@ class Player(object):
         self.up = False
         self.down = False
         self.standing = True
+        self.move = False
+
+    def count_steps(self, window, x):
+        window.blit(images.walk[f"{x}"][self.walk_count // 6], (self.x, self.y))
+        if self.move or not joysticks:
+            self.walk_count += 3
 
     def redraw(self, window):
         """Draw player on window."""
@@ -37,33 +47,24 @@ class Player(object):
             self.walk_count = 0
 
         if self.right:
-            window.blit(images.walk_right[self.walk_count // 6], (self.x, self.y))
-            self.walk_count += 3
+            self.count_steps(window, "right")
         if self.right_up:
-            window.blit(images.walk_right_up[self.walk_count // 6], (self.x, self.y))
-            self.walk_count += 3
+            self.count_steps(window, "right_up")
         if self.right_down:
-            window.blit(images.walk_right_down[self.walk_count // 6], (self.x, self.y))
-            self.walk_count += 3
+            self.count_steps(window, "right_down")
 
         if self.left:
-            window.blit(images.walk_left[self.walk_count // 6], (self.x, self.y))
-            self.walk_count += 3
+            self.count_steps(window, "left")
         if self.left_up:
-            window.blit(images.walk_left_up[self.walk_count // 6], (self.x, self.y))
-            self.walk_count += 3
-
+            self.count_steps(window, "left_up")
         if self.left_down:
-            window.blit(images.walk_left_down[self.walk_count // 6], (self.x, self.y))
-            self.walk_count += 3
+            self.count_steps(window, "left_down")
 
         if self.up:
-            window.blit(images.walk_up[self.walk_count // 6], (self.x, self.y))
-            self.walk_count += 3
+            self.count_steps(window, "up")
 
         if self.down:
-            window.blit(images.walk_down[self.walk_count // 6], (self.x, self.y))
-            self.walk_count += 3
+            self.count_steps(window, "down")
 
         if self.standing:
             window.blit(images.standing, (self.x, self.y))
@@ -310,17 +311,68 @@ class GameOver(object):
 
 # Creating player, ammo and ammo kit
 player = Player(200, 200, 64, 64)
+player2 = Player(200, 200, 64, 64)
 ammo_kit = AmmoKit(rules.screen_wight // 2, rules.screen_height // 2)
 hearth = Life()
 game_over = GameOver()
 explosions = []
 
 
+def menu_redraw():
+    run = True
+
+    # Choose game type
+    single = rules.font_big.render(
+        f"Single", True, "black")
+    double = rules.font_big.render(
+        f"Double", True, "black")
+    rules.window.blit(images.bg, (0, 0))
+
+    while run:
+        pygame.time.Clock().tick(27)
+        question_2_player = rules.font_big.render(
+            f"Do you want to play single player or multi player?", True, "black")
+        for event in pygame.event.get():
+            print(event.type)
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.KEYDOWN:
+
+                if event.key == pygame.K_LEFT:
+                    single = rules.font_big.render(
+                        f"Single", True, "white")
+                    double = rules.font_big.render(
+                        f"Double", True, "black")
+                    print(event)
+                if event.key == pygame.K_RIGHT:
+                    single = rules.font_big.render(
+                        f"Single", True, "black")
+                    double = rules.font_big.render(
+                        f"Double", True, "white")
+                    print(event)
+
+                if event.key == pygame.K_SPACE:
+                    run = False
+                    print(event)
+
+        rules.window.blit(
+            question_2_player, (rules.screen_wight // 2 - 500, rules.screen_height // 2 - 100)
+        )
+        rules.window.blit(
+            single, (rules.screen_wight // 2 - 300, rules.screen_height // 2 + 100)
+        )
+        rules.window.blit(
+            double, (rules.screen_wight // 2 + 100, rules.screen_height // 2 + 100)
+        )
+        pygame.display.update()
+
+
 def full_redraw(projectiles, tornados):
     """Redraw all objects, projectiles etc."""
     # Draw background
     rules.window.blit(images.bg, (0, 0))
-
+    level = rules.font_big.render(f"Level - {rules.level}", True, "black")
+    rules.window.blit(level, (rules.screen_wight // 2, 10))
     # End game
     if hearth.count == 0:
         game_over.redraw(rules.window)
@@ -344,10 +396,10 @@ def full_redraw(projectiles, tornados):
     elif hearth.count > 0:
 
         # Cooldown skill draw
-        cooldown_tornado = rules.font.render(f"{rules.tornado_ticker}", True, "black")
-        cooldown_snow = rules.font.render(f"{rules.freeze_ticker}", True, "black")
+        cooldown_tornado = rules.font.render(f"{rules.tornado_ticker}", True, (0, 0, 0))
+        cooldown_snow = rules.font.render(f"{rules.freeze_ticker}", True, (0, 0, 0))
         cooldown_explosion = rules.font.render(
-            f"{rules.explosive_ammo_ticker}", True, "black"
+            f"{rules.explosive_ammo_ticker}", True, (0, 0, 0)
         )
         if rules.tornado_ticker == 0:
             rules.window.blit(images.tornado_small, (rules.screen_wight - 50, 50))
@@ -425,6 +477,8 @@ def full_redraw(projectiles, tornados):
                 rules.max_ammo += 5
                 rules.count_projectiles = rules.max_ammo
                 rules.explosive_ammo = 0
+                rules.zombie_spawn = 0
+                rules.level = 1
 
             # Check if projectile hit enemy, remove both when hit
             for p in projectiles:
@@ -476,7 +530,7 @@ def full_redraw(projectiles, tornados):
         # Draw ammo and ammo kit
         ammo_kit.redraw(rules.window)
         ammo_text = rules.font_big.render(
-            f"{rules.count_projectiles} / {rules.max_ammo}", True, "black"
+            f"{rules.count_projectiles} / {rules.max_ammo}", True, (0, 0, 0)
         )
         rules.window.blit(
             ammo_text, (rules.screen_wight - 200, rules.screen_height - 100)
@@ -492,17 +546,18 @@ def start_game():
     """Start game"""
     first_upgrade = False
     second_upgrade = False
-    ticker = 0
-    game_over = False
+    rules.arrow_ticker = 0
     run = True
+
+    menu_redraw()
 
     # Main loop
     while run:
         rules.clock.tick(27)
 
         # Ticks
-        if ticker > 0:
-            ticker -= 1
+        if rules.arrow_ticker > 0:
+            rules.arrow_ticker -= 1
         if rules.spawn_ticker > 0:
             rules.spawn_ticker -= 1
         if rules.tornado_ticker > 0:
@@ -513,9 +568,10 @@ def start_game():
             rules.enemy_frozen_ticker -= 1
         if rules.explosive_ammo_ticker > 0:
             rules.explosive_ammo_ticker -= 1
+        rules.zombie_spawn += 0.1
 
         # Score count
-        if not game_over:
+        if not rules.game_over:
             rules.score += 0.1
 
         # Upgrade ammo
@@ -530,6 +586,177 @@ def start_game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            if joysticks:
+                if event.type == JOYBUTTONUP:
+                    if (
+                        event.button == 0
+                        and rules.tornado_ticker == 0
+                        and not player.standing
+                    ):
+                        tornado = Tornado(player.x, player.y)
+                        direction = check_direction(player)
+                        rules.tornados.append(
+                            {
+                                "tornado": tornado,
+                                "direction": direction,
+                            }
+                        )
+                        rules.tornado_ticker = 1000
+                    if (
+                        event.button == 1
+                        and rules.freeze_ticker == 0
+                        and not player.standing
+                    ):
+                        rules.enemy_frozen_ticker = 125
+                        rules.freeze_ticker = 3000
+                    if (
+                        event.button == 2
+                        and rules.explosive_ammo_ticker == 0
+                        and not player.standing
+                    ):
+                        rules.explosive_ammo = rules.max_ammo + 1
+                        rules.explosive_ammo_ticker = 5000
+                        rules.count_projectiles = rules.max_ammo
+                    if (
+                        event.button == 5
+                        and not player.standing
+                        and rules.arrow_ticker == 0
+                        and not rules.game_over
+                    ):
+                        arrow_shot(player, rules, Projectile)
+                if event.type == JOYHATMOTION:
+                    # Right
+                    if event.value == (1, 0):
+                        player.right = True
+                        player.right_up = False
+                        player.right_down = False
+                        player.left = False
+                        player.left_up = False
+                        player.left_down = False
+                        player.up = False
+                        player.down = False
+                        player.standing = False
+                        player.move = True
+                        # Left
+                    if event.value == (-1, 0):
+                        player.right = False
+                        player.right_up = False
+                        player.right_down = False
+                        player.left = True
+                        player.left_up = False
+                        player.left_down = False
+                        player.up = False
+                        player.down = False
+                        player.standing = False
+                        player.move = True
+                        # Down
+                    if event.value == (0, -1):
+                        player.right = False
+                        player.right_up = False
+                        player.right_down = False
+                        player.left = False
+                        player.left_up = False
+                        player.left_down = False
+                        player.up = False
+                        player.down = True
+                        player.standing = False
+                        player.move = True
+                    # Up
+                    if event.value == (0, 1):
+                        player.right = False
+                        player.right_up = False
+                        player.right_down = False
+                        player.left = False
+                        player.left_up = False
+                        player.left_down = False
+                        player.up = True
+                        player.down = False
+                        player.standing = False
+                        player.move = True
+                    # Right-down
+                    if event.value == (1, -1):
+                        player.right = False
+                        player.right_up = False
+                        player.right_down = True
+                        player.left = False
+                        player.left_up = False
+                        player.left_down = False
+                        player.up = False
+                        player.down = False
+                        player.standing = False
+                        player.move = True
+                    # Right-up
+                    if event.value == (1, 1):
+                        player.right = False
+                        player.right_up = True
+                        player.right_down = False
+                        player.left = False
+                        player.left_up = False
+                        player.left_down = False
+                        player.up = False
+                        player.down = False
+                        player.standing = False
+                        player.move = True
+                    # Left-down
+                    if event.value == (-1, -1):
+                        player.right = False
+                        player.right_up = False
+                        player.right_down = False
+                        player.left = False
+                        player.left_up = False
+                        player.left_down = True
+                        player.up = False
+                        player.down = False
+                        player.standing = False
+                        player.move = True
+                    # Left-up
+                    if event.value == (-1, 1):
+                        player.right = False
+                        player.right_up = False
+                        player.right_down = False
+                        player.left = False
+                        player.left_up = True
+                        player.left_down = False
+                        player.up = False
+                        player.down = False
+                        player.standing = False
+                        player.move = True
+                    if event.value == (0, 0):
+                        player.move = False
+        # Movements
+        if player.move:
+            if player.right and player.x < rules.screen_wight - player.wight:
+                player.x += player.speed
+            if (
+                player.right_up
+                and player.x < rules.screen_wight - player.wight
+                and player.y > 0
+            ):
+                player.x += player.speed
+                player.y -= player.speed
+            if (
+                player.right_down
+                and player.x < rules.screen_wight - player.wight
+                and player.y < rules.screen_height - player.height
+            ):
+                player.x += player.speed
+                player.y += player.speed
+            if player.left and player.x > 0:
+                player.x -= player.speed
+            if player.left_up and player.x > 0 and player.y > 0:
+                player.x -= player.speed
+                player.y -= player.speed
+            if (
+                player.left_down
+                and player.x > 0
+                and player.y < rules.screen_height - player.height
+            ):
+                player.x -= player.speed
+                player.y += player.speed
+            if player.up and player.y > 0:
+                player.y -= player.speed
+            if player.down and player.y < rules.screen_height - player.height:
+                player.y += player.speed
 
         # Collecting ammo kit
         if (ammo_kit.x + rules.mistake // 2) >= player.x >= (
@@ -547,7 +774,7 @@ def start_game():
 
         # No more lives
         if hearth.count == 0:
-            game_over = True
+            rules.game_over = True
         keys = pygame.key.get_pressed()
         k_up_rule = keys[pygame.K_UP] and player.y > 0
         k_down_rule = (
@@ -557,227 +784,189 @@ def start_game():
             keys[pygame.K_RIGHT] and player.x < rules.screen_wight - player.wight
         )
         k_left_rule = keys[pygame.K_LEFT] and player.x > 0
+        if not joysticks:
+            # Move right
+            if k_right_rule and not (
+                keys[pygame.K_LEFT] or keys[pygame.K_UP] or keys[pygame.K_DOWN]
+            ):
+                player.x += player.speed
+                player.right = True
+                player.right_up = False
+                player.right_down = False
+                player.left = False
+                player.left_up = False
+                player.left_down = False
+                player.up = False
+                player.down = False
+                player.standing = False
+            # Move right up
+            if (
+                k_right_rule
+                and k_up_rule
+                and not (keys[pygame.K_DOWN] or keys[pygame.K_LEFT])
+            ):
+                player.x += player.speed
+                player.y -= player.speed
+                player.right = False
+                player.right_up = True
+                player.right_down = False
+                player.left = False
+                player.left_up = False
+                player.left_down = False
+                player.up = False
+                player.down = False
+                player.standing = False
+            # Move right down
+            if (
+                k_right_rule
+                and k_down_rule
+                and not (keys[pygame.K_UP] or keys[pygame.K_LEFT])
+            ):
+                player.x += player.speed
+                player.y += player.speed
+                player.right = False
+                player.right_up = False
+                player.right_down = True
+                player.left = False
+                player.left_up = False
+                player.left_down = False
+                player.up = False
+                player.down = False
+                player.standing = False
 
-        # Move right
-        if k_right_rule and not (
-            keys[pygame.K_LEFT] or keys[pygame.K_UP] or keys[pygame.K_DOWN]
-        ):
-            player.x += player.speed
-            player.right = True
-            player.right_up = False
-            player.right_down = False
-            player.left = False
-            player.left_up = False
-            player.left_down = False
-            player.up = False
-            player.down = False
-            player.standing = False
-        # Move right up
-        if (
-            k_right_rule
-            and k_up_rule
-            and not (keys[pygame.K_DOWN] or keys[pygame.K_LEFT])
-        ):
-            player.x += player.speed
-            player.y -= player.speed
-            player.right = False
-            player.right_up = True
-            player.right_down = False
-            player.left = False
-            player.left_up = False
-            player.left_down = False
-            player.up = False
-            player.down = False
-            player.standing = False
-        # Move right down
-        if (
-            k_right_rule
-            and k_down_rule
-            and not (keys[pygame.K_UP] or keys[pygame.K_LEFT])
-        ):
-            player.x += player.speed
-            player.y += player.speed
-            player.right = False
-            player.right_up = False
-            player.right_down = True
-            player.left = False
-            player.left_up = False
-            player.left_down = False
-            player.up = False
-            player.down = False
-            player.standing = False
+            # Move left
+            if k_left_rule and not (
+                keys[pygame.K_RIGHT] or keys[pygame.K_UP] or keys[pygame.K_DOWN]
+            ):
+                player.x -= player.speed
+                player.right = False
+                player.right_up = False
+                player.right_down = False
+                player.left = True
+                player.left_up = False
+                player.left_down = False
+                player.up = False
+                player.down = False
+                player.standing = False
+            # Move left up
+            if (
+                k_left_rule
+                and k_up_rule
+                and not (keys[pygame.K_DOWN] or keys[pygame.K_RIGHT])
+            ):
+                player.x -= player.speed
+                player.y -= player.speed
+                player.right = False
+                player.right_up = False
+                player.right_down = False
+                player.left = False
+                player.left_up = True
+                player.left_down = False
+                player.up = False
+                player.down = False
+                player.standing = False
+            # Move left down
+            if (
+                k_left_rule
+                and k_down_rule
+                and not (keys[pygame.K_UP] or keys[pygame.K_RIGHT])
+            ):
+                player.x -= player.speed
+                player.y += player.speed
+                player.right = False
+                player.right_up = False
+                player.right_down = False
+                player.left = False
+                player.left_up = False
+                player.left_down = True
+                player.up = False
+                player.down = False
+                player.standing = False
 
-        # Move left
-        if k_left_rule and not (
-            keys[pygame.K_RIGHT] or keys[pygame.K_UP] or keys[pygame.K_DOWN]
-        ):
-            player.x -= player.speed
-            player.right = False
-            player.right_up = False
-            player.right_down = False
-            player.left = True
-            player.left_up = False
-            player.left_down = False
-            player.up = False
-            player.down = False
-            player.standing = False
-        # Move left up
-        if (
-            k_left_rule
-            and k_up_rule
-            and not (keys[pygame.K_DOWN] or keys[pygame.K_RIGHT])
-        ):
-            player.x -= player.speed
-            player.y -= player.speed
-            player.right = False
-            player.right_up = False
-            player.right_down = False
-            player.left = False
-            player.left_up = True
-            player.left_down = False
-            player.up = False
-            player.down = False
-            player.standing = False
-        # Move left down
-        if (
-            k_left_rule
-            and k_down_rule
-            and not (keys[pygame.K_UP] or keys[pygame.K_RIGHT])
-        ):
-            player.x -= player.speed
-            player.y += player.speed
-            player.right = False
-            player.right_up = False
-            player.right_down = False
-            player.left = False
-            player.left_up = False
-            player.left_down = True
-            player.up = False
-            player.down = False
-            player.standing = False
+            # Move up
+            if k_up_rule and not (
+                keys[pygame.K_RIGHT] or keys[pygame.K_LEFT] or keys[pygame.K_DOWN]
+            ):
+                player.y -= player.speed
+                player.right = False
+                player.right_up = False
+                player.right_down = False
+                player.left = False
+                player.left_up = False
+                player.left_down = False
+                player.up = True
+                player.down = False
+                player.standing = False
 
-        # Move up
-        if k_up_rule and not (
-            keys[pygame.K_RIGHT] or keys[pygame.K_LEFT] or keys[pygame.K_DOWN]
-        ):
-            player.y -= player.speed
-            player.right = False
-            player.right_up = False
-            player.right_down = False
-            player.left = False
-            player.left_up = False
-            player.left_down = False
-            player.up = True
-            player.down = False
-            player.standing = False
+            # Move down
+            if k_down_rule and not (
+                keys[pygame.K_RIGHT] or keys[pygame.K_LEFT] or keys[pygame.K_UP]
+            ):
+                player.y += player.speed
+                player.right = False
+                player.right_up = False
+                player.right_down = False
+                player.left = False
+                player.left_up = False
+                player.left_down = False
+                player.up = False
+                player.down = True
+                player.standing = False
 
-        # Move down
-        if k_down_rule and not (
-            keys[pygame.K_RIGHT] or keys[pygame.K_LEFT] or keys[pygame.K_UP]
-        ):
-            player.y += player.speed
-            player.right = False
-            player.right_up = False
-            player.right_down = False
-            player.left = False
-            player.left_up = False
-            player.left_down = False
-            player.up = False
-            player.down = True
-            player.standing = False
+            # Reset walk count when standing
+            if not any(
+                [
+                    keys[pygame.K_LEFT],
+                    keys[pygame.K_RIGHT],
+                    keys[pygame.K_UP],
+                    keys[pygame.K_DOWN],
+                ]
+            ):
+                player.walk_count = 0
 
-        # Reset walk count when standing
-        if not any(
-            [
-                keys[pygame.K_LEFT],
-                keys[pygame.K_RIGHT],
-                keys[pygame.K_UP],
-                keys[pygame.K_DOWN],
-            ]
-        ):
-            player.walk_count = 0
+            # Fire ammo
+            if (
+                keys[pygame.K_SPACE]
+                and not player.standing
+                and rules.arrow_ticker == 0
+                and not rules.game_over
+            ):
+                arrow_shot(player, rules, Projectile)
 
-        # Fire ammo
-        if (
-            keys[pygame.K_SPACE]
-            and not player.standing
-            and ticker == 0
-            and not game_over
-        ):
-            ticker = 10
-            direction = None
-            if player.right:
-                direction = "right"
-            if player.right_up:
-                direction = "right_up"
-            if player.right_down:
-                direction = "right_down"
-            if player.left:
-                direction = "left"
-            if player.left_up:
-                direction = "left_up"
-            if player.left_down:
-                direction = "left_down"
-            if player.up:
-                direction = "up"
-            if player.down:
-                direction = "down"
-            if rules.count_projectiles > 0:
-                rules.count_projectiles -= 1
-                rules.projectiles.append(
+            # Tornado skill
+            if (keys[pygame.K_q]) and rules.tornado_ticker == 0 and not player.standing:
+                tornado = Tornado(player.x, player.y)
+                direction = check_direction(player)
+                rules.tornados.append(
                     {
-                        "arrow": Projectile(player.x, player.y, 20, 20),
+                        "tornado": tornado,
                         "direction": direction,
                     }
                 )
-            if rules.explosive_ammo > 0:
-                rules.explosive_ammo -= 1
+                rules.tornado_ticker = 1000
 
-        # Tornado skill
-        if keys[pygame.K_q] and rules.tornado_ticker == 0 and not player.standing:
-            tornado = Tornado(player.x, player.y)
-            direction = None
-            if player.right:
-                direction = "right"
-            if player.right_up:
-                direction = "right_up"
-            if player.right_down:
-                direction = "right_down"
-            if player.left:
-                direction = "left"
-            if player.left_up:
-                direction = "left_up"
-            if player.left_down:
-                direction = "left_down"
-            if player.up:
-                direction = "up"
-            if player.down:
-                direction = "down"
-            rules.tornados.append(
-                {
-                    "tornado": tornado,
-                    "direction": direction,
-                }
-            )
-            rules.tornado_ticker = 1000
+            # Freeze skill
+            if (keys[pygame.K_w]) and rules.freeze_ticker == 0 and not player.standing:
+                rules.enemy_frozen_ticker = 125
+                rules.freeze_ticker = 3000
 
-        # Freeze skill
-        if keys[pygame.K_w] and rules.freeze_ticker == 0 and not player.standing:
-            rules.enemy_frozen_ticker = 125
-            rules.freeze_ticker = 3000
-
-        # Explosive arrow skill
-        if (
-            keys[pygame.K_e]
-            and rules.explosive_ammo_ticker == 0
-            and not player.standing
-        ):
-            rules.explosive_ammo = rules.max_ammo + 1
-            rules.explosive_ammo_ticker = 5000
-            rules.count_projectiles = rules.max_ammo
+            # Explosive arrow skill
+            if (
+                (keys[pygame.K_e])
+                and rules.explosive_ammo_ticker == 0
+                and not player.standing
+            ):
+                rules.explosive_ammo = rules.max_ammo + 1
+                rules.explosive_ammo_ticker = 5000
+                rules.count_projectiles = rules.max_ammo
 
         # Spawn enemy
-        if rules.spawn_ticker == 0 and not game_over and rules.enemy_frozen_ticker == 0:
+        if (
+            rules.spawn_ticker == 0
+            and not rules.game_over
+            and rules.enemy_frozen_ticker == 0
+            and len(rules.enemies) < 61
+        ):
             # Make sure enemy won't spawn too close to player
             x = random.randint(rules.mistake, rules.screen_wight - rules.mistake)
             y = random.randint(rules.mistake, rules.screen_height - rules.mistake)
@@ -785,9 +974,9 @@ def start_game():
                 player.y + rules.mistake * 3 >= y >= player.y - rules.mistake * 3
             ):
                 if player.x > 600:
-                    x -= rules.mistake * 6
+                    x -= rules.mistake * 8
                 if player.x < 600:
-                    x += rules.mistake * 6
+                    x += rules.mistake * 8
             enemy = Enemy(
                 x,
                 y,
@@ -796,6 +985,13 @@ def start_game():
                 random.uniform(1, 2),
             )
             rules.enemies.append(enemy)
-            rules.spawn_ticker = 20
+            if rules.zombie_spawn < 150:
+                rules.spawn_ticker = 20
+            if 300 > rules.zombie_spawn > 150:
+                rules.spawn_ticker = 15
+                rules.level = 2
+            if (450 > rules.zombie_spawn > 300) and hearth.count <= 2:
+                rules.spawn_ticker = 10
+                rules.level = 3
 
         full_redraw(rules.projectiles, rules.tornados)
